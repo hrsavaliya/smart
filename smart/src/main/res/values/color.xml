@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#111215</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#FFFFFF</color>
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorGrey">#575757</color>
+
+    <color name="colorAdBorder">#E91E63</color>
+
+    <color name="shimmer_color">@color/light_alpha40</color>
+
+    <color name="light_alpha10">#1AFFFFFF</color>
+    <color name="light_alpha20">#33FFFFFF</color>
+    <color name="light_alpha30">#4DFFFFFF</color>
+    <color name="light_alpha40">#66FFFFFF</color>
+    <color name="light_alpha50">#80FFFFFF</color>
+    <color name="light_alpha60">#99FFFFFF</color>
+    <color name="light_alpha70">#B3FFFFFF</color>
+    <color name="light_alpha80">#CCFFFFFF</color>
+    <color name="light_alpha90">#E6FFFFFF</color>
+
+    <color name="dark_alpha10">#1A000000</color>
+    <color name="dark_alpha20">#33000000</color>
+    <color name="dark_alpha30">#4D000000</color>
+    <color name="dark_alpha40">#66000000</color>
+    <color name="dark_alpha50">#80000000</color>
+    <color name="dark_alpha60">#99000000</color>
+    <color name="dark_alpha70">#B3000000</color>
+    <color name="dark_alpha80">#CC000000</color>
+    <color name="dark_alpha90">#E6000000</color>
+</resources>

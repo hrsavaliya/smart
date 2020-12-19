@@ -1,0 +1,149 @@
+plugins {
+    id 'com.android.library'
+
+}
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+        multiDexEnabled true
+
+    }
+
+    buildTypes {
+        debug {
+            resValue "string", "FACEBOOK_APP_ID", '"YOUR_PLACEMENT_ID"'
+
+            debuggable true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            resValue "string", "FACEBOOK_APP_ID", '"YOUR_PLACEMENT_ID"'
+
+            debuggable false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+def libraryGroupId = 'com.hk'
+def libraryArtifactId = 'smart'
+def libraryVersion = '1.0.4'
+
+publishing {
+    publications {
+        aar(MavenPublication) {
+
+            groupId libraryGroupId
+            version libraryVersion
+            artifactId libraryArtifactId
+
+            artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+            pom.withXml {
+                final dependenciesNode = asNode().appendNode('dependencies')
+
+                ext.addDependency = { Dependency dep, String scope ->
+                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+                        return // ignore invalid dependencies
+
+                    final dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', dep.group)
+                    dependencyNode.appendNode('artifactId', dep.name)
+                    dependencyNode.appendNode('version', dep.version)
+                    dependencyNode.appendNode('scope', scope)
+
+                    if (!dep.transitive) {
+                        // If this dependency is transitive, we should force exclude
+                        // all of its dependencies from the POM
+                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        exclusionNode.appendNode('groupId', '*')
+                        exclusionNode.appendNode('artifactId', '*')
+                    } else if (!dep.properties.excludeRules.empty) {
+                        // Otherwise add specified exclude rules
+                        final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        dep.properties.excludeRules.each { ExcludeRule rule ->
+                            exclusionNode.appendNode('groupId', rule.group ?: '*')
+                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                        }
+                    }
+                }
+                // Map all gradle dependencies to maven dependencies (the compile dependency of gradle is only
+                // present to support legacy gradle build files)
+                configurations.compile.getAllDependencies().each { dep -> addDependency(dep, "compile") }
+                configurations.api.getAllDependencies().each { dep -> addDependency(dep, "compile") }
+                configurations.implementation.getAllDependencies().each { dep -> addDependency(dep, "runtime") }
+            }
+        }
+    }
+}
+
+artifactory {
+    contextUrl = 'http://178.128.242.23:8082/artifactory'
+    publish {
+        repository {
+            repoKey = 'gradle-release-local'
+
+            username = artifactory_username
+            password = artifactory_password
+        }
+        defaults {
+            publications('aar')
+            publishArtifacts = true
+
+            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
+            publishPom = true
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation "androidx.cardview:cardview:1.0.0"
+
+    implementation 'com.google.android.gms:play-services-ads:19.5.0'
+    implementation 'com.facebook.android:audience-network-sdk:6.2.0'
+    implementation 'com.startapp:inapp-sdk:4.6.1'
+
+    implementation 'com.android.volley:volley:1.1.1'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.10'
+
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    // https://loopj.com/android-async-http/
+    implementation 'com.loopj.android:android-async-http:1.4.9'
+
+    // https://github.com/Kaopiz/KProgressHUD
+    implementation 'com.kaopiz:kprogresshud:1.2.0'
+
+    // https://github.com/GrenderG/Toasty
+//    implementation 'com.github.GrenderG:Toasty:1.4.2'
+
+//    implementation 'com.infstory:proguard-snippets:1.0.0'
+
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+
+}
