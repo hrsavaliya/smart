@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     SmartInterstitialPreload smartInterstitialPreload;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
